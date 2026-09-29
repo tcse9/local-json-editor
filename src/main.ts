@@ -1,6 +1,7 @@
 import { createJSONEditor, Mode, type Content } from 'vanilla-jsoneditor';
 import 'vanilla-jsoneditor/themes/jse-theme-dark.css';
 import './style.css';
+import type { CurlResult } from './curl-api';
 
 type JSONEditorInstance = ReturnType<typeof createJSONEditor>;
 
@@ -127,4 +128,103 @@ window.addEventListener('mouseup', () => {
   if (!dragging) return;
   dragging = false;
   handle.classList.remove('dragging');
+});
+
+// --- Curl executor ---------------------------------------------------------
+
+const curlToggle = document.getElementById('curl-toggle') as HTMLButtonElement;
+const curlPanel = document.getElementById('curl-panel') as HTMLElement;
+const curlInput = document.getElementById('curl-input') as HTMLTextAreaElement;
+const curlRunBtn = document.getElementById('curl-run') as HTMLButtonElement;
+const curlStatus = document.getElementById('curl-status') as HTMLElement;
+const curlStdout = document.getElementById('curl-stdout') as HTMLElement;
+const curlStderr = document.getElementById('curl-stderr') as HTMLElement;
+const curlSendLeft = document.getElementById('curl-send-left') as HTMLButtonElement;
+const curlSendRight = document.getElementById('curl-send-right') as HTMLButtonElement;
+
+let lastCurlJsonText: string | null = null;
+
+curlToggle.addEventListener('click', () => {
+  curlPanel.hidden = !curlPanel.hidden;
+  if (!curlPanel.hidden) curlInput.focus();
+});
+
+async function execCurl(command: string): Promise<CurlResult> {
+  // Electron build: run curl in the main process over IPC.
+  if (window.curlAPI) {
+    return window.curlAPI.run(command);
+  }
+
+  // Browser build served by `vite`/`vite preview`: same exec, done by the
+  // Node dev/preview server instead of the (sandboxed, CORS-bound) page.
+  try {
+    const response = await fetch('/api/curl-run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ command }),
+    });
+    return (await response.json()) as CurlResult;
+  } catch {
+    return {
+      ok: false,
+      error: 'Could not reach the curl proxy. This only works when the app is served by `vite`/`vite preview` or the Electron build.',
+    };
+  }
+}
+
+async function runCurl(): Promise<void> {
+  const command = curlInput.value.trim();
+  if (!command) return;
+
+  curlRunBtn.disabled = true;
+  curlStatus.textContent = 'Running…';
+  curlStdout.textContent = '';
+  curlStderr.hidden = true;
+  curlSendLeft.disabled = true;
+  curlSendRight.disabled = true;
+  lastCurlJsonText = null;
+
+  const result = await execCurl(command);
+  curlRunBtn.disabled = false;
+
+  if (!result.ok) {
+    curlStatus.textContent = `Error: ${result.error}`;
+    return;
+  }
+
+  curlStatus.textContent = `Exit code ${result.exitCode}`;
+  curlStdout.textContent = result.stdout || '(empty response)';
+
+  if (result.stderr.trim()) {
+    curlStderr.textContent = result.stderr;
+    curlStderr.hidden = false;
+  }
+
+  try {
+    JSON.parse(result.stdout);
+    lastCurlJsonText = result.stdout;
+    curlSendLeft.disabled = false;
+    curlSendRight.disabled = false;
+  } catch {
+    lastCurlJsonText = null;
+  }
+}
+
+curlRunBtn.addEventListener('click', () => void runCurl());
+
+curlInput.addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    event.preventDefault();
+    void runCurl();
+  }
+});
+
+curlSendLeft.addEventListener('click', () => {
+  if (!lastCurlJsonText) return;
+  leftEditor.updateProps({ content: { text: lastCurlJsonText } });
+});
+
+curlSendRight.addEventListener('click', () => {
+  if (!lastCurlJsonText) return;
+  rightEditor.updateProps({ content: { text: lastCurlJsonText } });
 });
