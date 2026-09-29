@@ -24,8 +24,16 @@
           <button id="curl-send-left" disabled>Send to Left &#8592;</button>
           <button id="curl-send-right" disabled>Send to Right &#8594;</button>
         </div>
-        <pre id="curl-stdout" class="curl-output"></pre>
-        <pre id="curl-stderr" class="curl-output curl-stderr" hidden></pre>
+        <div class="curl-output-section">
+          <button id="curl-response-toggle" class="curl-section-toggle" type="button" aria-expanded="true">
+            Response<span id="curl-response-size" class="curl-output-size"></span>
+          </button>
+          <pre id="curl-stdout" class="curl-output"></pre>
+        </div>
+        <div class="curl-output-section" id="curl-stderr-section" hidden>
+          <button id="curl-stderr-toggle" class="curl-section-toggle" type="button" aria-expanded="true">Stderr</button>
+          <pre id="curl-stderr" class="curl-output curl-stderr"></pre>
+        </div>
       </div>
       <div id="app">
       <div id="left-panel" class="editor-panel">

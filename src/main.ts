@@ -138,7 +138,11 @@ const curlInput = document.getElementById('curl-input') as HTMLTextAreaElement;
 const curlRunBtn = document.getElementById('curl-run') as HTMLButtonElement;
 const curlStatus = document.getElementById('curl-status') as HTMLElement;
 const curlStdout = document.getElementById('curl-stdout') as HTMLElement;
+const curlResponseToggle = document.getElementById('curl-response-toggle') as HTMLButtonElement;
+const curlResponseSize = document.getElementById('curl-response-size') as HTMLElement;
 const curlStderr = document.getElementById('curl-stderr') as HTMLElement;
+const curlStderrSection = document.getElementById('curl-stderr-section') as HTMLElement;
+const curlStderrToggle = document.getElementById('curl-stderr-toggle') as HTMLButtonElement;
 const curlSendLeft = document.getElementById('curl-send-left') as HTMLButtonElement;
 const curlSendRight = document.getElementById('curl-send-right') as HTMLButtonElement;
 
@@ -148,6 +152,21 @@ curlToggle.addEventListener('click', () => {
   curlPanel.hidden = !curlPanel.hidden;
   if (!curlPanel.hidden) curlInput.focus();
 });
+
+function toggleSection(toggle: HTMLButtonElement, content: HTMLElement): void {
+  const expanded = toggle.getAttribute('aria-expanded') !== 'false';
+  toggle.setAttribute('aria-expanded', String(!expanded));
+  content.hidden = expanded;
+}
+
+curlResponseToggle.addEventListener('click', () => toggleSection(curlResponseToggle, curlStdout));
+curlStderrToggle.addEventListener('click', () => toggleSection(curlStderrToggle, curlStderr));
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 async function execCurl(command: string): Promise<CurlResult> {
   // Electron build: run curl in the main process over IPC.
@@ -179,7 +198,9 @@ async function runCurl(): Promise<void> {
   curlRunBtn.disabled = true;
   curlStatus.textContent = 'Running…';
   curlStdout.textContent = '';
-  curlStderr.hidden = true;
+  curlResponseSize.textContent = '';
+  curlStderr.textContent = '';
+  curlStderrSection.hidden = true;
   curlSendLeft.disabled = true;
   curlSendRight.disabled = true;
   lastCurlJsonText = null;
@@ -194,10 +215,11 @@ async function runCurl(): Promise<void> {
 
   curlStatus.textContent = `Exit code ${result.exitCode}`;
   curlStdout.textContent = result.stdout || '(empty response)';
+  curlResponseSize.textContent = result.stdout ? ` (${formatBytes(new Blob([result.stdout]).size)})` : '';
 
   if (result.stderr.trim()) {
     curlStderr.textContent = result.stderr;
-    curlStderr.hidden = false;
+    curlStderrSection.hidden = false;
   }
 
   try {

@@ -126,6 +126,44 @@ body {
   color: #999;
 }
 
+.curl-output-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.curl-section-toggle {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  color: #aaa;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.curl-section-toggle:hover {
+  color: #fff;
+}
+
+.curl-section-toggle::before {
+  content: '\25BE';
+  font-size: 10px;
+}
+
+.curl-section-toggle[aria-expanded='false']::before {
+  content: '\25B8';
+}
+
+.curl-output-size {
+  font-weight: 400;
+  color: #777;
+}
+
 .curl-output {
   margin: 0;
   max-height: 220px;
