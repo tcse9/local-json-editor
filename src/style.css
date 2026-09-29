@@ -84,7 +84,7 @@ body {
 
 #splitter {
   position: relative;
-  width: 44px;
+  width: 56px;
   flex: 0 0 auto;
   background: var(--splitter-bg);
   display: flex;
@@ -114,11 +114,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  /* Sit above .splitter-handle so clicks near the middle of the splitter
+     hit these buttons instead of the resize handle underneath them. */
+  position: relative;
+  z-index: 10;
 }
 
 .splitter-actions button {
-  width: 28px;
-  height: 28px;
+  width: 38px;
+  height: 30px;
   border-radius: 4px;
   border: 1px solid #3a3d45;
   background: #2a2d34;
