@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local JSON Editor</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="left-panel" class="editor-panel">
+        <div class="panel-header">
+          <span class="panel-title">Document 1</span>
+          <div class="panel-actions">
+            <button class="open-btn" title="Import a .json file into this panel">Open</button>
+            <button class="save-btn" title="Export this panel's content to a .json file">Save</button>
+          </div>
+        </div>
+        <input type="file" class="file-input" accept=".json,application/json" hidden />
+        <div class="editor-mount"></div>
+      </div>
+      <div id="splitter">
+        <div class="splitter-handle"></div>
+        <div class="splitter-actions">
+          <button id="copy-to-left" title="Copy the contents of the right panel to the left panel">&#8592;</button>
+          <button id="copy-to-right" title="Copy the contents of the left panel to the right panel">&#8594;</button>
+        </div>
+      </div>
+      <div id="right-panel" class="editor-panel">
+        <div class="panel-header">
+          <span class="panel-title">Document 2</span>
+          <div class="panel-actions">
+            <button class="open-btn" title="Import a .json file into this panel">Open</button>
+            <button class="save-btn" title="Export this panel's content to a .json file">Save</button>
+          </div>
+        </div>
+        <input type="file" class="file-input" accept=".json,application/json" hidden />
+        <div class="editor-mount"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
