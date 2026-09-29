@@ -135,6 +135,7 @@ window.addEventListener('mouseup', () => {
 const curlToggle = document.getElementById('curl-toggle') as HTMLButtonElement;
 const curlPanel = document.getElementById('curl-panel') as HTMLElement;
 const curlInput = document.getElementById('curl-input') as HTMLTextAreaElement;
+const curlInputToggle = document.getElementById('curl-input-toggle') as HTMLButtonElement;
 const curlRunBtn = document.getElementById('curl-run') as HTMLButtonElement;
 const curlStatus = document.getElementById('curl-status') as HTMLElement;
 const curlStdout = document.getElementById('curl-stdout') as HTMLElement;
@@ -159,6 +160,7 @@ function toggleSection(toggle: HTMLButtonElement, content: HTMLElement): void {
   content.hidden = expanded;
 }
 
+curlInputToggle.addEventListener('click', () => toggleSection(curlInputToggle, curlInput));
 curlResponseToggle.addEventListener('click', () => toggleSection(curlResponseToggle, curlStdout));
 curlStderrToggle.addEventListener('click', () => toggleSection(curlStderrToggle, curlStderr));
 

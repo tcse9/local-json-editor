@@ -12,11 +12,14 @@
         <button id="curl-toggle" title="Paste and run a curl command">Curl Executor</button>
       </div>
       <div id="curl-panel" hidden>
-        <textarea
-          id="curl-input"
-          placeholder="curl https://api.example.com/data"
-          spellcheck="false"
-        ></textarea>
+        <div class="curl-output-section">
+          <button id="curl-input-toggle" class="curl-section-toggle" type="button" aria-expanded="true">Command</button>
+          <textarea
+            id="curl-input"
+            placeholder="curl https://api.example.com/data"
+            spellcheck="false"
+          ></textarea>
+        </div>
         <div class="curl-controls">
           <button id="curl-run">Run</button>
           <span id="curl-status"></span>
